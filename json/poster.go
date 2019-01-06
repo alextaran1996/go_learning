@@ -18,7 +18,7 @@ type Poster struct {
 type Params struct {
 	ID        int    // Remeber! The name of the field descriptor should be surronded by "".Example `json:"name_of_your_field"`
 	Firstname string `json:"first_name"` // Field descriptor.Required to correlate fields from JSON file with your structure
-	Lastname  string `json:"last_name"`  // If file descriptor dont corrspond name in JSON file, this field will be ignores
+	Lastname  string `json:"last_name"`  // If file descriptor dont corrspond name in JSON file, this field will be ignored
 }
 
 func main() {
