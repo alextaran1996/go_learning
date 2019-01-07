@@ -5,6 +5,7 @@ import (
 	"time"
 )
 
+// Average execution time is 630 nanoseconds
 func linearsearch(slice []int, search int) ([]int, time.Duration) { // Linear search
 	start := time.Now()    // Get current time
 	searchindex := []int{} // Create slice for index values
