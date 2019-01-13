@@ -8,18 +8,28 @@ import (
 	"golang.org/x/net/html"
 )
 
-func countwords(ref *html.Node) (numofw int, err error) {
-	if ref.Type == html.ElementNode {
+var numofw int
+
+func countwords(ref *html.Node) int {
+	switch ref.Type {
+	case html.ElementNode:
 		for _, val := range ref.Attr {
-			numofw += procstr(val.Val)
+			numofw += procstr(val.Val) // Add value when value field contains any value
+			numofw += procstr(val.Key) // Add value when key field contains any value
 		}
-		for child := ref.FirstChild; child != nil; child = child.NextSibling {
-			countwords(child)
-		}
+	case html.TextNode:
+		numofw += procstr(ref.Data) // Add value from Data field
+
 	}
-	return numofw, nil
+	for child := ref.FirstChild; child != nil; child = child.NextSibling { // Recurcivly processing child elements
+		countwords(child)
+	}
+	return numofw
+	// Empty return. If we exactly specified returned values as (var_name type) we can use emty return
+
 }
 
+// Function that splits strings on words and count number of words
 func procstr(s string) int {
 	news := strings.Fields(s)
 	return len(news)
