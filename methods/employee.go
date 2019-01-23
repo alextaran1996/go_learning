@@ -32,7 +32,7 @@ func (empl Employee) addNew(exsworker []Employee) []Employee {
 	return exsworker
 }
 
-func (a *Age) addNew() { // Working only with pointer check the book
+func (a *Age) addNew() {
 	a.age++
 }
 
@@ -61,7 +61,7 @@ func main() {
 	workers = greg.addNew(workers)
 	workers = tim.del(workers)
 	old := Age{42}
-	old.addNew()
+	old.addNew() // the same as (*old).addNew().Here is compiler implicitly gets variable address
 	fmt.Println(old)
 	fmt.Println(workers)
 
