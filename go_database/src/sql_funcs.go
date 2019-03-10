@@ -35,8 +35,7 @@ func createuser(conn *sql.DB, db *DBParams, user *User) {
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(id)
-
+	fmt.Printf("User %s was created under id %d\n", user.Name, id)
 }
 
 // Get all users

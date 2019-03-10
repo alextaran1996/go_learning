@@ -8,16 +8,17 @@ import (
 )
 
 // Read YAML config and get variables
-func readconfig(file string) *DBParams {
+func readconfig(file string) (*DBParams, error) {
 	var db DBParams
 	data, err := ioutil.ReadFile(file)
 	if err != nil {
-		log.Fatal(err)
+		return nil, err
 	}
 	err = yaml.Unmarshal(data, &db)
 	if err != nil {
 		log.Fatalf("cannot unmarshal data: %v", err)
+		return nil, err
 	}
-	return &db
+	return &db, nil
 
 }
