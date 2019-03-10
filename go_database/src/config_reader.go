@@ -1,0 +1,23 @@
+package main
+
+import (
+	"io/ioutil"
+	"log"
+
+	yaml "gopkg.in/yaml.v2"
+)
+
+// Read YAML config and get variables
+func readconfig(file string) *DBParams {
+	var db DBParams
+	data, err := ioutil.ReadFile(file)
+	if err != nil {
+		log.Fatal(err)
+	}
+	err = yaml.Unmarshal(data, &db)
+	if err != nil {
+		log.Fatalf("cannot unmarshal data: %v", err)
+	}
+	return &db
+
+}
