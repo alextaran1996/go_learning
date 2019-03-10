@@ -7,11 +7,15 @@ import (
 	"log"
 )
 
+// Agenda
+// Call functions using flags from CLI
+// Idea: create one more layer of functions that will get neccessary arguments and use functions
+
 func main() {
 	config := flag.String("c", "config.yml", "Path to to config.yml file")
 	// newid := flag.String("n", "", "Create new record.Use -n Hleb")
 	// updateid := flag.String("u", "", "Update existing value. Use -u 2 Ann")
-	// deleteid := flag.String("d", "", "Delete specified id.Use -d 1")
+	deleteid := flag.Int("d", 0, "Delete specified id.Use -d 1")
 	// getusers := flag.String("g", "", "Get all records.Use -g")
 	flag.Parse()
 	db, err := readconfig(*config)
@@ -24,10 +28,12 @@ func main() {
 		log.Fatal(err)
 	}
 	defer conn.Close()
-
-	name := User{Name: "German"}
-	createuser(conn, db, &name)
-	deleteID(conn, db, 1)
+	// name := User{Name: *newid}
+	// createuser(conn, db, &name)
+	if *deleteid == 0 {
+		log.Fatalln("id value shoud be setted and be grater then 0")
+	}
+	// deleteID(conn, db, *deleteid)
 	// updateID(conn, &db, 2, "Zoom")
-	getusers(conn, db)
+	// getusers(conn, db)
 }
