@@ -2,3 +2,4 @@
 **/debug
 **/.vscode
 .gitsecret/keys/random_seed
+**/*.tfvars
