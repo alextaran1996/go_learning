@@ -1,0 +1,45 @@
+{
+    "builders": [
+    {
+        "type": "virtualbox-iso",
+        "boot_command": [
+            "<tab> text ks=http://{{ .HTTPIP }}:{{ .HTTPPort }}/ks.cfg<enter><wait>"
+        ],
+        "boot_wait": "10s",
+        "disk_size": 10000,
+        "guest_os_type": "RedHat_64",
+        "iso_url": "http://mirror.datacenter.by/pub/CentOS/7.6.1810/isos/x86_64/CentOS-7-x86_64-Minimal-1810.iso",
+        "iso_checksum": "bd43d41e01c2a46b3cb23eb9139dce4b",
+        "iso_checksum_type": "md5",
+        "ssh_username": "vagrant",
+        "ssh_password": "vagrant",
+        "cpus": 1,
+        "headless": "true",
+        "memory": 1024,
+        "http_directory": "src",
+        "shutdown_command": "echo 'vagrant' | sudo -S /sbin/halt -h -p", 
+        "vm_name": "centos7_packer", 
+        "ssh_wait_timeout": "10000s",
+        "ssh_port": 22
+    }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "scripts": [
+              "vagrant.sh"
+            ]
+        },
+        {
+            "type": "shell",
+            "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "script": "software_provision.sh"
+        }
+    ],
+    "post-processors": [
+        {
+            "type": "vagrant",
+            "output": "builds/{{.Provider}}-centos7.box"
+        }
+    ]
+}
