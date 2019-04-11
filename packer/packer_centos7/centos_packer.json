@@ -27,14 +27,35 @@
         {
             "type": "shell",
             "scripts": [
-              "vagrant.sh"
+              "scripts/vagrant_key.sh"
             ]
         },
         {
             "type": "shell",
             "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
-            "script": "software_provision.sh"
+            "script": "scripts/software_provision.sh",
+            "pause_after": "15s"
+            
+        },
+        {
+            "type": "shell",
+            "inline": ["sudo shutdown -r now","echo 'Rebooting...'"],
+            "expect_disconnect": "true",
+            "pause_after": "45s"
+        },
+        {
+            "type": "shell",
+            "execute_command": "echo 'vagrant' | {{.Vars}} sudo -S -E bash '{{.Path}}'",
+            "script": "scripts/vguest_install.sh",
+            "pause_after": "15s"
+        },
+        {
+            "type": "shell",
+            "inline": ["sudo shutdown -r now","echo 'Rebooting...'"],
+            "expect_disconnect": "true",
+            "pause_after": "45s"
         }
+
     ],
     "post-processors": [
         {
