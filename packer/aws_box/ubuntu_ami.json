@@ -1,0 +1,29 @@
+{
+    "variables": {
+        "access_key": "",
+        "secret_key": ""
+    },
+    "builders": [
+        {
+            "type": "amazon-ebs",
+            "access_key":"{{user `aws_access_key`}}",
+            "secret_key": "{{user `aws_secret_key`}}",
+            "ami_name": "Ubuntu_jenkins_{{timestamp}}",
+            "instance_type": "t2.micro",
+            "region": "eu-central-1",
+            "source_ami": "ami-05af84768964d3dc0",
+            "ami_description": "Ubuntu image with Jenkins",
+            "ami_virtualization_type": "hvm",
+            "associate_public_ip_address": "true",
+            "ssh_username": "ubuntu"
+        }
+    ],
+    "provisioners": [
+        {
+            "type": "shell",
+            "execute_command": "echo 'ubuntu' | sudo -S sh -c '{{ .Vars }} {{ .Path }}'",
+            "script": "scripts/jenkins_install.sh",
+            "pause_after": "60s"
+        }
+    ]
+}
