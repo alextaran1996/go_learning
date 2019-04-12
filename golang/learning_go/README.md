@@ -1,7 +1,4 @@
-# FYI
-This is a simple repo with basic go projects
+#Info
+This is a simple repo with basic go programms
 
 
-To do:
- - git dotfiles
- - git secret
