@@ -4,3 +4,4 @@
 .gitsecret/keys/random_seed
 **/*.tfvars
 **/*secret*
+**/.vagrant/*
