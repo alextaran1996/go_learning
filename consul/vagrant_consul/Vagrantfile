@@ -1,49 +1,32 @@
 Vagrant.configure("2") do |config|
-  config.vm.define "server" do |server|
-    server.vm.box = "centos/7"
-	server.vm.hostname = "server"
-	server.vm.network "private_network", type: "dhcp"
-	server.vm.provision "shell", inline: <<-SHELL
-		sudo yum -y update
-        yum -y install vim unzip bind-utils
-        curl -O https://releases.hashicorp.com/consul/1.4.4/consul_1.4.4_linux_amd64.zip
-        unzip -d /usr/bin consul_1.4.4_linux_amd64.zip
-        rm -f consul_1.4.4_linux_amd64.zip
-        sed -i 's#PasswordAuthentication no#PasswordAuthentication yes#' /etc/ssh/sshd_config
-		sed -i 's@#PermitRootLogin yes@PermitRootLogin yes@' /etc/ssh/sshd_config
-		systemctl restart sshd
-	SHELL
-	server.vm.provider "virtualbox" do |vb|
-		vb.memory = "1024"
-		vb.name = "server"
-		vb.customize ["modifyvm", :id, "--audio", "none"]
-	end
-	
-  end
-  
-  (1..2).each do |i|
-    config.vm.define "n#{i}" do |n1|
-        n1.vm.box = "centos/7"
+	(1..3).each do |i|
+  	config.vm.define "n#{i}" do |n1|
+      n1.vm.box = "centos/7"
 	    n1.vm.hostname = "n#{i}"
 	    n1.vm.network "private_network", type: "dhcp"
 	    n1.vm.provision "shell", inline: <<-SHELL
-		    sudo yum -y update
-            yum -y install vim unzip bind-utils
-            curl -O https://releases.hashicorp.com/consul/1.4.4/consul_1.4.4_linux_amd64.zip
-            unzip -d /usr/bin consul_1.4.4_linux_amd64.zip
-            rm -f consul_1.4.4_linux_amd64.zip
+		    yum -y update
+        yum -y install vim unzip bind-utils yum-utils device-mapper-persistent-data lvm2
+				yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+				yum -y install docker-ce
+				usermod -aG docker $(whoami)
+				usermod -aG docker vagrant
+				systemctl enable docker.service
+				systemctl start docker.service
+        curl -O https://releases.hashicorp.com/consul/1.4.4/consul_1.4.4_linux_amd64.zip
+        unzip -d /usr/bin consul_1.4.4_linux_amd64.zip
+        rm -f consul_1.4.4_linux_amd64.zip
 		    sed -i 's#PasswordAuthentication no#PasswordAuthentication yes#' /etc/ssh/sshd_config
 		    sed -i 's@#PermitRootLogin yes@PermitRootLogin yes@' /etc/ssh/sshd_config
-		    systemctl restart sshd
+		    systemctl restart sshd	
 	    SHELL
 	    n1.vm.provider "virtualbox" do |vb|
 		    vb.memory = "1024"
 		    vb.name = "n#{i}"
 		    vb.customize ["modifyvm", :id, "--audio", "none"]
 	    end
-    end
-  end
-   
+		end
+  end  
 end
 
 
