@@ -3,4 +3,5 @@
 **/.vscode
 .gitsecret/keys/random_seed
 **/*.tfvars
+**/backend.tf
 **/*secret*
