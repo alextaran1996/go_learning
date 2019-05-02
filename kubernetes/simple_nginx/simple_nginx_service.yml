@@ -1,0 +1,22 @@
+apiVersion: v1
+kind: Service 
+metadata:
+  name: simplenginx
+  namespace: default
+  labels: 
+    app: nginx
+spec:
+  ports:
+    - port: 80
+      protocol: TCP
+  selector:
+    app: nginx
+# Create deployment before,then:
+# kubectl.exe create -f .\simple_nginx_service.yml
+# kubectl get svc simplenginx 
+# kubectl get pods 
+# Copy name one of the containers and then:
+# kubectl.exe exec -it <your pod name> apt update
+# kubectl.exe exec -it <your pod name> apt install -y curl
+# kubectl.exe exec -it <your pod name> curl <ClusterIP that you get from command kubectl get svc simplenginx>
+# Need to install curl because it doesn't intalled by default
