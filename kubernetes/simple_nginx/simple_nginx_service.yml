@@ -6,6 +6,7 @@ metadata:
   labels: 
     app: nginx
 spec:
+  type: ClusterIP # Expose a service on an internal IP in the cluster, which makes the service only reachable from within the cluster
   ports:
     - port: 80
       protocol: TCP
