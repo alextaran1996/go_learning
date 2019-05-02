@@ -1,0 +1,21 @@
+apiVersion: apps/v1 # Which API version of kubernetes will be used.Kuberenetes version is 1.14.1
+kind: Deployment # Kind of the object that will be deployed 
+metadata: # Additional data that will help uniquely identify object
+  name: simplenginx # Name og the object
+spec: # Specification of desired state
+  selector: # Helps to work only with objects that related to specified resource
+    matchLabels: # Check object's Labels
+      app: nginx
+  replicas: 2 # Number of pods matching template
+  template: # Pod description
+    metadata: # Additional data that will help uniquely identify pod
+      labels: # Set label for pod
+        app: nginx
+    spec: # Specification for pod
+      containers: 
+      - name: simplenginx # Set name for the container
+        image: nginx:1.13.12 # Set image that will be used for container
+        ports: 
+        - containerPort: 80 # Open 80 port
+# To run deployment: kubectl apply -f simple_nginx.yml --record
+# --record - adds a record about the created object in history and will be handy for reverting
