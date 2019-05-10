@@ -1,0 +1,66 @@
+# Generated using site https://min.io/download#/kubernetes. Standalone 2Gb object storage.
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  # This name uniquely identifies the PVC. Will be used in deployment below.
+  name: minio-pv-claim
+  labels:
+    app: minio-storage-claim
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    # This is the request for storage. Should be available in the cluster.
+    requests:
+      storage: 2
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: minio-deployment
+spec:
+  strategy:
+    type: Recreate
+  template:
+    metadata:
+      labels:
+        # Label is used as selector in the service.
+        app: minio
+    spec:
+      # Refer to the PVC created earlier
+      volumes:
+      - name: storage
+        persistentVolumeClaim:
+          # Name of the PVC created earlier
+          claimName: minio-pv-claim
+      containers:
+      - name: minio
+        image: minio/minio
+        args:
+        - server
+        - /storage
+        env:
+        # MinIO access key and secret key
+        - name: MINIO_ACCESS_KEY
+          value: "2FMNLBQJHBDGSS34UGDS"
+        - name: MINIO_SECRET_KEY
+          value: "Uq5Z4Nn1CyJARPVNbTPsDpe9dLkBUGi1cDKqsTwv"
+        ports:
+        - containerPort: 9000
+        # Mount the volume into the pod
+        volumeMounts:
+        - name: storage # must match the volume name, above
+          mountPath: "/storage"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: minio-service
+spec:
+  type: LoadBalancer
+  ports:
+    - port: 9000
+      targetPort: 9000
+      protocol: TCP
+  selector:
+    app: minio
