@@ -37,3 +37,12 @@ spec: # Specification for the deployment object
                 key: mysqldbpas
           - name: WORDPRESS_DB_HOST
             value: 127.0.0.1
+        # livenessProbe:
+        #   httpGet:
+        #     host: 127.0.0.1
+        #     path: /
+        #     port: 80
+        #   initialDelaySeconds: 30 # Make first check after 30s when container started
+        #   periodSeconds: 5 # Check every 5s
+        #   successThreshold: 1 # Return after 1 success
+        #   failureThreshold: 3 # After 3 fails containers will be restarted
