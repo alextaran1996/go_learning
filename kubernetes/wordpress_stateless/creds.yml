@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wordpress-mysql-secr # Name of the Secret object
+type: Opaque
+data: # Creds in base64 coding
+  mysqldbpas: cm9vdA== # Password for mysql root 
