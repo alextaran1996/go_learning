@@ -1,0 +1,7 @@
+apiVersion: v1
+kind: Secret
+metadata:
+  name: wordpress-mysql-secr
+type: Opaque
+data:
+  mysqldbpas: cm9vdA==

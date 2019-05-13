@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata: 
+  name: wordpress-deployment
+spec:
+  replicas: 1
+  selector: 
+    matchLabels: # All the containers with app:wordpress
+      app: wordpress
+  template:
+    metadata:
+      labels: 
+        app: wordpress # Set label pod: wordpress for the pod
+    spec:
+      containers:
+      - name: mysql
+        image: mysql:5.7
+        ports: # Open port 3306
+        - name: mysql-port
+          containerPort: 3306
+        env:
+          - name: MYSQL_ROOT_PASSWORD
+            valueFrom:
+              secretKeyRef:
+                name: wordpress-mysql-secr
+                key: mysqldbpas
+        volumeMounts:
+        - name: mysql-storage
+          mountPath: /var/lib/mysql
+      - name: wordpress # Name of the container
+        image: wordpress:4-php7.0 # Image that will be used
+        ports: # Open 80 port
+        - name: http-port
+          containerPort: 80 
+        env:
+          - name: WORDPRESS_DB_PASSWORD # The same as MYSQL_ROOT_PASSWORD as this password is used to connect to mysql db
+            valueFrom:
+              secretKeyRef:
+                name: wordpress-mysql-secr
+                key: mysqldbpas
+          - name: WORDPRESS_DB_HOST
+            value: 127.0.0.1
+      volumes:
+        - name: mysql-storage
+          persistentVolumeClaim:
+            claimName: mysql-volume
