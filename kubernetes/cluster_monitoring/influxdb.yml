@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: influxdb
+  labels:
+    app: influxdb
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: influxdb
+  template:
+    metadata:
+      name: influxdb # pod_name, can be used in dns
+      labels: # label for the pod
+        app: influxdb
+    spec:
+      containers:
+      - name: influxdb
+        image: influxdb:1.5.4
+        ports:
+          - containerPort: 8086
+        volumeMounts:
+        - mountPath: /data
+          name: influxdb-storage
+      volumes:
+      - name: influxdb-storage
+        emptyDir: {}
+

@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service 
+metadata:
+  name: influxdb-service
+spec:
+  type: NodePort
+  selector: # Set of podsthat will use this service
+    app: influxdb
+  ports:
+    - port: 8086  # within cluster
+      nodePort: 30086 # port in node
+      targetPort: 8086 # port in pod
+      protocol: TCP

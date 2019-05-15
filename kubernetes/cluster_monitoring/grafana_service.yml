@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: Service 
+metadata:
+  name: grafana-service
+spec:
+  type: NodePort
+  selector: # Set of podsthat will use this service
+    app: grafana
+  ports:
+    - port: 3000 # within cluster
+      nodePort: 30000
+      targetPort: 3000
+      protocol: TCP
