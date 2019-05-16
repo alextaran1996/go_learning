@@ -79,10 +79,6 @@ func updateuser(w http.ResponseWriter, r *http.Request) {
 
 }
 
-func init() {
-
-}
-
 func main() {
 	reader := bufio.NewReader(os.Stdin)
 	serveraddr, _ := reader.ReadString('\n')          // Read  IP addr of the mysql server
