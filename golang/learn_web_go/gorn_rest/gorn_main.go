@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"strconv"
+	"strings"
 
 	"github.com/gorilla/mux"
 
@@ -20,15 +23,11 @@ type Worker struct {
 	Age  int
 }
 
+var db *gorm.DB // Global variable to avoid creating new connection in every function
+var err error
+
 // Migration will connect to database and migrate structure in it
 func Migration() {
-	dbparam := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", "root", "root", "172.17.0.2", 3306, "gorm")
-	db, err := gorm.Open("mysql", dbparam) // Open doesn't connect ot database it's only create new connection with specified credentials
-	if err != nil {
-		fmt.Println(err)
-		panic("Failed to connect to database")
-	}
-	defer db.Close()
 	db.AutoMigrate(&Worker{}) // Reference to struture that will be migrated to mysql
 }
 
@@ -40,29 +39,16 @@ func HandleRequestsServ() {
 	MyRouter.HandleFunc("/user/{name}/{age}", createuser).Methods("POST")
 	MyRouter.HandleFunc("/user/{name}/{age}", updateuser).Methods("PUT")
 	log.Fatal(http.ListenAndServe(":8081", MyRouter))
+	defer db.Close()
 }
 
 func allusers(w http.ResponseWriter, r *http.Request) {
-	dbparam := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", "root", "root", "172.17.0.2", 3306, "gorm")
-	db, err := gorm.Open("mysql", dbparam) // Change databse url
-	if err != nil {
-		fmt.Println(err)
-		panic("Failed to connect to database")
-	}
-	defer db.Close()
 	var workers []Worker
 	db.Find(&workers)
 	json.NewEncoder(w).Encode(workers)
 }
 
 func deleteuser(w http.ResponseWriter, r *http.Request) {
-	dbparam := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", "root", "root", "172.17.0.2", 3306, "gorm")
-	db, err := gorm.Open("mysql", dbparam) // Change databse url
-	if err != nil {
-		fmt.Println(err)
-		panic("Failed to connect to database")
-	}
-	defer db.Close()
 	vars := mux.Vars(r)
 	name := vars["name"]
 	var worker Worker
@@ -73,16 +59,7 @@ func deleteuser(w http.ResponseWriter, r *http.Request) {
 }
 
 func createuser(w http.ResponseWriter, r *http.Request) {
-	dbparam := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", "root", "root", "172.17.0.2", 3306, "gorm")
-	// ?parseTime=true. The default internal output type of MySQL DATE and DATETIME values is []byte which allows you to scan the value into a []byte, string or sql.RawBytes variable in your program.
-	// You can do that by changing the internal output type from []byte to time.Time with the DSN parameter parseTime=true.
-	// Need this because gorm.Model contains fields time.Time type but default mysql driver returns []uint8
-	db, err := gorm.Open("mysql", dbparam) // Change databse url
-	if err != nil {
-		fmt.Println(err)
-		panic("Failed to connect to database")
-	}
-	defer db.Close()
+
 	vars := mux.Vars(r)
 	name := vars["name"]
 	age, _ := strconv.Atoi(vars["age"])
@@ -91,13 +68,7 @@ func createuser(w http.ResponseWriter, r *http.Request) {
 }
 
 func updateuser(w http.ResponseWriter, r *http.Request) {
-	dbparam := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", "root", "root", "172.17.0.2", 3306, "gorm")
-	db, err := gorm.Open("mysql", dbparam) // Change databse url
-	if err != nil {
-		fmt.Println(err)
-		panic("Failed to connect to database")
-	}
-	defer db.Close()
+
 	var worker Worker
 	vars := mux.Vars(r)
 	db.Where("name = ?", vars["name"]).Find(&worker) // Find all the user with specified name add put all the info in worker variable
@@ -108,8 +79,24 @@ func updateuser(w http.ResponseWriter, r *http.Request) {
 
 }
 
+func init() {
+
+}
+
 func main() {
-	fmt.Println("Running gorn_main!")
+	reader := bufio.NewReader(os.Stdin)
+	serveraddr, _ := reader.ReadString('\n')          // Read  IP addr of the mysql server
+	serveraddr = strings.TrimSuffix(serveraddr, "\n") // Remove new line symbol at the of the string
+	dbparam := fmt.Sprintf("%s:%s@tcp(%s:%d)/%s?parseTime=true", "root", "root", serveraddr, 3306, "gorm")
+	// ?parseTime=true. The default internal output type of MySQL DATE and DATETIME values is []byte which allows you to scan the value into a []byte, string or sql.RawBytes variable in your program.
+	// You can do that by changing the internal output type from []byte to time.Time with the DSN parameter parseTime=true.
+	// Need this because gorm.Model contains fields time.Time type but default mysql driver returns []uint8
+	db, err = gorm.Open("mysql", dbparam) // Open doesn't connect ot database it's only create new connection with specified credentials
+	if err != nil {
+		fmt.Println(err)
+		panic("Failed to connect to database")
+	}
+	fmt.Println("Starting gorn_main!")
 	Migration()
 	HandleRequestsServ()
 }
