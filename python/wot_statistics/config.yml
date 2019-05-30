@@ -1,0 +1,6 @@
+app_id: 'your_app_id'
+logfile: "/tmp/node_exporter/stat.prom"
+accounts:
+  - leha_Bog
+  - vtaran1991
+  - van_taran
