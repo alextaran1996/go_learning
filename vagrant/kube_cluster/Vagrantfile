@@ -24,7 +24,7 @@ Vagrant.configure("2") do |config|
       sudo add-apt-repository "deb https://apt.kubernetes.io/ kubernetes-xenial main" 
       sudo apt update -y
       sudo swapoff -a 
-      sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+      sudo sed -i 's/.*swap/#&/' /etc/fstab
       sudo apt install -y kubelet kubeadm kubectl
       sudo echo "KUBELET_EXTRA_ARGS=--node-ip=$1" > /etc/default/kubelet
       sudo systemctl  daemon-reload
@@ -36,9 +36,9 @@ Vagrant.configure("2") do |config|
       sudo chown vagrant: /etc/kubernetes/admin.conf
       export KUBECONFIG=/etc/kubernetes/admin.conf
       echo 'export KUBECONFIG=/etc/kubernetes/admin.conf' >> /etc/bash.bashrc 
-      sudo kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
-      sudo kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
       sudo kubeadm token create --print-join-command > join-command
+      kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/rbac-kdd.yaml
+      kubectl apply -f https://docs.projectcalico.org/v3.3/getting-started/kubernetes/installation/hosted/kubernetes-datastore/calico-networking/1.7/calico.yaml
     SHELL
       s.args = "'192.168.50.10'"
     end
@@ -58,7 +58,7 @@ Vagrant.configure("2") do |config|
       sudo usermod -aG docker $USER
       sudo usermod -aG docker vagrant
       sudo swapoff -a 
-      sudo sed -i '/ swap / s/^\(.*\)$/#\1/g' /etc/fstab
+      sudo sed -i 's/.*swap/#&/' /etc/fstab
       wget -qO - https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
       sudo add-apt-repository "deb https://apt.kubernetes.io/ kubernetes-xenial main" 
       sudo apt update -y
