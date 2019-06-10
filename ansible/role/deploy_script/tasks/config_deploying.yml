@@ -36,7 +36,7 @@
 - name: Run docker cs_res_lim
   docker_container:
     name: cs_res_lim
-    image: tmhub.io/ipi/cs_res_lim
+    image: "REPO"
     auto_remove: "yes"
     command: /etc/cs_res_lim/config.yml
   volumes: 
