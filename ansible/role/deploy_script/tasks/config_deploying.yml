@@ -31,7 +31,7 @@
     name: Run cs_res_lim script
     state: present
     special_time: hourly
-    job: "docker run --name=cs_res_lim --rm  -v /var/spool/node_exporter/:/var/spool/node_exporter/ -v /etc/cs_res_lim:/etc/cs_res_lim tmhub.io/ipi/cs_res_lim /etc/cs_res_lim/config.yml"
+    job: "docker run --name=cs_res_lim --rm  -v /var/spool/node_exporter/:/var/spool/node_exporter/ -v /etc/cs_res_lim:/etc/cs_res_lim REPO /etc/cs_res_lim/config.yml"
 # Run docker image
 - name: Run docker cs_res_lim
   docker_container:
