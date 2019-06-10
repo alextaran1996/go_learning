@@ -1,0 +1,4 @@
+endpoint: 'your_enpoint'
+api: 'your_api_key'
+secret: 'you_secret_key'
+logfile: '/var/spool/node_exporter/csres.prom'

@@ -1,0 +1,45 @@
+---
+# Check for proxy
+- include: handlers/docker_restart.yml
+- name: Check for proxy
+  copy:
+    dest: /etc/systemd/system/docker.service.d/http-proxy.conf
+    content: |
+        Environment="HTTP_PROXY=your=proxy"
+        Environment="HTTPS_PROXY=your-proxy"
+  notify: docker-restart
+    
+# Create dicrectory for config
+- name: Create dicrectory for config
+  file:
+    path: /etc/cs_res_lim
+    state: directory
+# Move config
+- name: Move config
+  copy:
+    src: "config.yml"
+    dest: "/etc/cs_res_lim/config.yml"
+    
+# Check for exporter directory
+- name: Check for node_exporter directory
+  file:
+    path: /var/spool/node_exporter/
+    state: directory
+# Add task in cron 
+- name: Add task in cron 
+  cron:
+    name: Run cs_res_lim script
+    state: present
+    special_time: hourly
+    job: "docker run --name=cs_res_lim --rm  -v /var/spool/node_exporter/:/var/spool/node_exporter/ -v /etc/cs_res_lim:/etc/cs_res_lim tmhub.io/ipi/cs_res_lim /etc/cs_res_lim/config.yml"
+# Run docker image
+- name: Run docker cs_res_lim
+  docker_container:
+    name: cs_res_lim
+    image: tmhub.io/ipi/cs_res_lim
+    auto_remove: "yes"
+    command: /etc/cs_res_lim/config.yml
+  volumes: 
+    - /etc/cs_res_lim:/etc/cs_res_lim:ro
+    - /var/spool/node_exporter/:/var/spool/node_exporter/
+

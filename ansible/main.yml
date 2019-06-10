@@ -1,0 +1,7 @@
+---
+- name: Deploy script
+  hosts: all
+  gather_facts: no
+  strategy: free
+  roles:
+    - role: deploy_script
