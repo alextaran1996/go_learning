@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: jenkins
+  labels:
+    app: jenkins
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jenkins
+  template: 
+    metadata:
+      labelels:
+        app: jenkins
+    spec:
+      containers:
+      - name: jenkins
+        image: jenkins/jenkins
+        resources:
+          requests: # What we will  guaranteed to get
+            memory: "512Mi"
+            cpu: "500m"
+          limits: # Limits that we can't exceed
+            memory: "1Gi"
+            cpu: "1000m"            
+        ports:
+          - name: http-port
+            containerPort: 8080
+          - name: jnkp port
+            containerPort: 50000     
+
+
