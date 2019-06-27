@@ -11,12 +11,15 @@ spec:
       app: jenkins
   template: 
     metadata:
-      labelels:
+      labels:
         app: jenkins
     spec:
       containers:
       - name: jenkins
         image: jenkins/jenkins
+        volumeMounts:
+          - name: jenkins-storage # name of the volume you will mount
+            mountPath: /var/jenkins_home # where mount this volume
         resources:
           requests: # What we will  guaranteed to get
             memory: "512Mi"
@@ -27,7 +30,39 @@ spec:
         ports:
           - name: http-port
             containerPort: 8080
-          - name: jnkp port
-            containerPort: 50000     
+          - name: jnlp-port
+            containerPort: 50000  
+      restartPolicy: OnFailure
+---
+apiVersion: v1
+kind: PersistentVolumeClaim 
+metadata:
+  name: jenkins-storage
+spec:
+  accessModes: 
+    - ReadWriteOnce # the volume can be mounted as read-write by a single node
+  resources: 
+    requests: 
+      storage: 5Gi
+---
+apiVersion: v1
+kind: Service 
+metadata:
+  name: jenkins
+spec:
+  type: LoadBalancer
+  selector:
+    app: jenkins
+  ports:
+  - name: jenkins
+    protocol: TCP
+    port: 80
+    targetPort: http-port
+  - name: jnlp 
+    protocol: TCP
+    port: 50000
+    targetPort: jnlp-port
+
+    
 
 
