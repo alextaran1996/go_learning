@@ -1,0 +1,83 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+spec:
+  replicas: 1
+  selector: # The selector field defines how the Deployment finds which Pods to manage
+    matchLabels: 
+      app: prometheus
+  template:
+    metadata:
+      labels: # label for pod
+        app: prometheus
+    spec:
+      containers:
+      - name: prometheus
+        image: prom/prometheus
+        resources: # restriction on resource usage
+          requests: # guaranteed
+            memory: "512Mi"
+            cpu: "256m"
+          limits: # max
+            memory: "1Gi"
+            cpu: "512m"
+        volumeMounts: # mount volume
+          - name: prometheus-volumeclaim
+            mountPath: /prometheus/
+          - name: prom-config 
+            mountPath: /etc/prometheus
+        ports: # expose port
+          - name: prom-port
+            containerPort: 9090
+        args:
+          - "--config.file=/etc/prometheus/prometheus.yml"
+          - "--storage.tsdb.path=/prometheus/"
+        securityContext: # specify security settings for a Pod
+          runAsUser: 0
+      volumes: # Put configmap object in the volume
+        - name: prom-config 
+          configMap:
+            name: prometheus-config
+        - name: prometheus-volumeclaim
+          persistentVolumeClaim:
+            claimName: prometheus-volumeclaim
+
+
+---
+apiVersion: v1 
+kind: PersistentVolumeClaim
+metadata: 
+  name: prometheus-volumeclaim
+spec:
+  accessModes: # Only one node can read/write
+    - ReadWriteOnce
+  resources: 
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1 
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+data:
+   prometheus.yml: |-
+    global:
+      scrape_interval: 15s # Set the scrape interval to every 15 seconds. Default is every 1 minute.
+      evaluation_interval: 15s # Evaluate rules every 15 seconds. The default is every 1 minute.
+    rule_files:
+    scrape_configs:
+      - job_name: 'prometheus'
+        scrape_interval: 5s
+        static_configs:
+          - targets: ['localhost:9090']
+      - job_name: "node"
+        scrape_interval: "15s"
+        static_configs:
+        - targets: ['exporter:9100']
+
+
+    
+
+      
+          

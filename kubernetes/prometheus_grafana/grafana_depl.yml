@@ -1,0 +1,91 @@
+apiVersion: apps/v1
+kind: Deployment 
+metadata:
+  name: grafana
+spec:
+  replicas: 1
+  selector: 
+    matchLabels:
+      app: grafana 
+  template:
+    metadata:
+      labels:
+        app: grafana 
+    spec:
+      containers:
+        - name: grafana 
+          image: grafana/grafana
+          volumeMounts:
+            - name: grafana-storage
+              mountPath: /var/lib/grafana
+            - name: grafana-config
+              mountPath: /etc/grafana/provisioning/datasources/
+          resources: # restriction on resource usage
+            requests: # guaranteed
+              memory: "512Mi"
+              cpu: "256m"
+            limits: # max
+              memory: "1Gi"
+              cpu: "512m"
+          ports:
+            - name: grafana-port
+              containerPort: 3000
+          env:
+            - name: GF_SECURITY_ADMIN_PASSWORD
+              value: admin
+          securityContext: # specify security settings for a Pod
+            runAsUser: 0
+      volumes:
+        - name: grafana-config
+          configMap:
+            name: grafana-datasource
+        - name: grafana-storage
+          persistentVolumeClaim:
+            claimName: grafana-storage
+
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: grafana-storage
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 5Gi
+---
+apiVersion: v1 
+kind: ConfigMap
+metadata:
+  name: grafana-datasource
+data:
+  datasource.yml: |-
+    apiVersion: 1
+    deleteDatasources:
+      - name: Prometheus
+        orgId: 1
+    datasources:
+    - name: Prometheus
+      type: prometheus
+      access: proxy
+      orgId: 1
+      url: http://prometheus:9090
+      password:
+      user:
+      database:
+      basicAuth: false
+      basicAuthUser:
+      basicAuthPassword:
+      withCredentials:
+      isDefault: true
+      jsonData:
+        graphiteVersion: "1.1"
+        tlsAuth: false
+        tlsAuthWithCACert: false
+      secureJsonData:
+        tlsCACert: "..."
+        tlsClientCert: "..."
+        tlsClientKey: "..."
+      version: 1
+    editable: true

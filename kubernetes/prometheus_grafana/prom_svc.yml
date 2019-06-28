@@ -1,0 +1,15 @@
+apiVersion: v1
+kind: Service 
+metadata:
+  name: prometheus
+spec:
+  type: LoadBalancer
+  selector: # Choose pods to work with
+    app: prometheus
+  ports:
+  - name: prom
+    protocol: TCP
+    port: 9090
+    targetPort: prom-port
+  
+  
